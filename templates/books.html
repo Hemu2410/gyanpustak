@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Books - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Browse Books</h2>
+        <p>Find textbooks for your courses</p>
+    </div>
+
+    <form method="get" class="filter-bar">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search by title, author, ISBN, or keyword..." style="flex:1;padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius);">
+        <select name="category">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+            <option value="{{ cat['category'] }}" {% if category == cat['category'] %}selected{% endif %}>{{ cat['category'] }}</option>
+            {% endfor %}
+        </select>
+        <select name="type">
+            <option value="">All Types</option>
+            <option value="new" {% if book_type == 'new' %}selected{% endif %}>New</option>
+            <option value="used" {% if book_type == 'used' %}selected{% endif %}>Used</option>
+        </select>
+        <select name="format">
+            <option value="">All Formats</option>
+            <option value="hardcover" {% if book_format == 'hardcover' %}selected{% endif %}>Hardcover</option>
+            <option value="softcover" {% if book_format == 'softcover' %}selected{% endif %}>Softcover</option>
+            <option value="electronic" {% if book_format == 'electronic' %}selected{% endif %}>Electronic</option>
+        </select>
+        <select name="purchase_option">
+            <option value="">Buy & Rent</option>
+            <option value="buy" {% if purchase_option == 'buy' %}selected{% endif %}>Buy Only</option>
+            <option value="rent" {% if purchase_option == 'rent' %}selected{% endif %}>Rent Only</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if books %}
+    <div class="grid grid-4">
+        {% for book in books %}
+        <div class="book-card">
+            <div class="book-cover-placeholder" style="min-height:120px;font-size:0.85rem;">
+                {{ book['title'][:40] }}{% if book['title']|length > 40 %}...{% endif %}
+            </div>
+            <div class="book-info">
+                <div class="book-title">{{ book['title'] }}</div>
+                <div class="book-author">{{ book['authors'] or 'Unknown' }}</div>
+                <div class="book-meta">
+                    <span>{{ book['type'] }}</span>
+                    <span>{{ book['format'] }}</span>
+                    <span>{{ book['purchase_option'] }}</span>
+                </div>
+                <div style="margin-bottom:6px;">
+                    <span class="stars">
+                        {% set avg = book['avg_rating']|round|int %}
+                        {% for i in range(5) %}
+                            {% if i < avg %}&#9733;{% else %}<span class="empty">&#9733;</span>{% endif %}
+                        {% endfor %}
+                    </span>
+                    <small style="color:var(--text-light);">({{ book['review_count'] }})</small>
+                </div>
+                <div class="book-price">Rs. {{ "%.2f"|format(book['price']) }}</div>
+                <div style="font-size:0.8rem;color:var(--text-light);margin-top:2px;">
+                    {% if book['quantity'] > 0 %}In Stock ({{ book['quantity'] }}){% else %}<span style="color:var(--danger);">Out of Stock</span>{% endif %}
+                </div>
+                <div class="book-actions">
+                    <a href="{{ url_for('book_detail', book_id=book['Book_id']) }}" class="btn btn-outline btn-sm">Details</a>
+                    {% if session.get('user_type') == 'student' and book['quantity'] > 0 %}
+                    <form action="{{ url_for('add_to_cart', book_id=book['Book_id']) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-primary ">Add to Cart</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No books found</h3>
+        <p>Try adjusting your search filters</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

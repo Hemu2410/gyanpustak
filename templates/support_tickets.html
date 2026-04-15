@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Support Tickets - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+            <h2>All Tickets</h2>
+            <p>View and manage customer trouble tickets</p>
+        </div>
+        <button onclick="document.getElementById('ticketModal').classList.add('active')" class="btn btn-primary">Create Ticket</button>
+    </div>
+
+    <div class="filter-bar">
+        <a href="{{ url_for('support_tickets') }}" class="btn {% if not status_filter %}btn-primary{% else %}btn-outline{% endif %} btn-sm">All</a>
+        <a href="{{ url_for('support_tickets', status='new') }}" class="btn {% if status_filter == 'new' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">New</a>
+        <a href="{{ url_for('support_tickets', status='assigned') }}" class="btn {% if status_filter == 'assigned' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">Assigned</a>
+        <a href="{{ url_for('support_tickets', status='in-process') }}" class="btn {% if status_filter == 'in-process' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">In Process</a>
+        <a href="{{ url_for('support_tickets', status='completed') }}" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">Completed</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Created By</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>#{{ ticket['Ticket_id'] }}</td>
+                <td>{{ ticket['title'] }}</td>
+                <td>{{ ticket['category_name'] }}</td>
+                <td>{{ ticket['creator_name'] }}</td>
+                <td><span class="badge badge-{{ ticket['status'] }}">{{ ticket['status'] }}</span></td>
+                <td>{{ ticket['date_logged'] }}</td>
+                <td>
+                    {% if ticket['status'] == 'new' %}
+                    <form method="post" action="{{ url_for('assign_ticket', ticket_id=ticket['Ticket_id']) }}" style="display:flex;gap:6px;">
+                        <select name="admin_id" required style="padding:4px 8px;font-size:0.8rem;border:1px solid var(--border);border-radius:4px;">
+                            {% for admin in admins %}
+                            <option value="{{ admin['User_id'] }}">{{ admin['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                    </form>
+                    {% else %}
+                    <span style="color:var(--text-light);font-size:0.85rem;">View only</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="modal-overlay" id="ticketModal">
+    <div class="modal">
+        <h3>Create Trouble Ticket</h3>
+        <form method="post" action="{{ url_for('support_create_ticket') }}">
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category_id" required>
+                    <option value="1">User Profile</option>
+                    <option value="2">Products</option>
+                    <option value="3">Cart</option>
+                    <option value="4">Orders</option>
+                    <option value="5">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" required placeholder="Brief description of the issue">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" required placeholder="Describe the problem..."></textarea>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button type="button" onclick="document.getElementById('ticketModal').classList.remove('active')" class="btn btn-outline">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

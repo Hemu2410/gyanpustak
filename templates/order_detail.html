@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order['Order_id'] }} - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Order #{{ order['Order_id'] }}</h2>
+        <p>Placed on {{ order['date_created'] }}</p>
+    </div>
+
+    <div class="grid grid-2">
+        <div class="card">
+            <h4 style="margin-bottom:12px;">Order Details</h4>
+            <table style="box-shadow:none;">
+                <tr><td style="font-weight:600;">Status</td><td><span class="badge badge-{{ order['status'] }}">{{ order['status'] }}</span></td></tr>
+                <tr><td style="font-weight:600;">Shipping</td><td>{{ order['shipping_type'] }}</td></tr>
+                <tr><td style="font-weight:600;">Card</td><td>{{ order['cc_type'] }} ending {{ order['cc_number'][-4:] if order['cc_number'] else 'N/A' }}</td></tr>
+                {% if order['date_fulfilled'] %}<tr><td style="font-weight:600;">Fulfilled</td><td>{{ order['date_fulfilled'] }}</td></tr>{% endif %}
+            </table>
+        </div>
+        <div class="card">
+            <h4 style="margin-bottom:12px;">Items</h4>
+            {% for item in items %}
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+                <div>
+                    <strong>{{ item['title'] }}</strong>
+                    <div style="font-size:0.8rem;color:var(--text-light);">{{ item['authors'] }} | Qty: {{ item['quantity'] }}</div>
+                </div>
+                <span style="font-weight:600;">Rs. {{ "%.2f"|format(item['price'] * item['quantity']) }}</span>
+            </div>
+            {% endfor %}
+            <div style="text-align:right;padding-top:12px;font-size:1.2rem;font-weight:700;color:var(--primary-dark);">
+                Total: Rs. {{ "%.2f"|format(total) }}
+            </div>
+        </div>
+    </div>
+
+    {% if order['status'] not in ('shipped', 'canceled') %}
+    <form action="{{ url_for('cancel_order', order_id=order['Order_id']) }}" method="post" style="margin-top:20px;">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</button>
+    </form>
+    {% endif %}
+
+    <a href="{{ url_for('orders') }}" class="btn btn-outline" style="margin-top:10px;">&larr; Back to Orders</a>
+</div>
+{% endblock %}

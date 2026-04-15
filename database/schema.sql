@@ -1,0 +1,237 @@
+DROP TABLE IF EXISTS TICKET_STATUS_LOG;
+DROP TABLE IF EXISTS TICKET;
+DROP TABLE IF EXISTS TICKET_CATEGORY;
+DROP TABLE IF EXISTS ORDER_BOOK;
+DROP TABLE IF EXISTS ORDERS;
+DROP TABLE IF EXISTS CART_BOOK;
+DROP TABLE IF EXISTS CART;
+DROP TABLE IF EXISTS REVIEW;
+DROP TABLE IF EXISTS USES;
+DROP TABLE IF EXISTS TEACHES;
+DROP TABLE IF EXISTS OFFERS;
+DROP TABLE IF EXISTS COURSE;
+DROP TABLE IF EXISTS INSTRUCTOR;
+DROP TABLE IF EXISTS DEPARTMENT;
+DROP TABLE IF EXISTS BOOK;
+DROP TABLE IF EXISTS SUPER_ADMIN;
+DROP TABLE IF EXISTS ADMIN;
+DROP TABLE IF EXISTS CUSTOMER_SUPPORT;
+DROP TABLE IF EXISTS EMPLOYEE;
+DROP TABLE IF EXISTS STUDENT;
+DROP TABLE IF EXISTS USER;
+DROP TABLE IF EXISTS UNIVERSITY;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+CREATE TABLE UNIVERSITY (
+    University_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    address VARCHAR(255),
+    rep_first_name VARCHAR(100),
+    rep_last_name VARCHAR(100),
+    rep_email VARCHAR(200),
+    rep_phone VARCHAR(20)
+);
+
+CREATE TABLE USER (
+    User_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    Email VARCHAR(200) UNIQUE NOT NULL,
+    password VARCHAR(200) NOT NULL,
+    phone VARCHAR(20),
+    address VARCHAR(255),
+    University_id INT,
+    user_type VARCHAR(20) NOT NULL DEFAULT 'student',
+    FOREIGN KEY (University_id) REFERENCES UNIVERSITY(University_id)
+);
+
+CREATE TABLE STUDENT (
+    User_id INT PRIMARY KEY,
+    dob DATE,
+    status VARCHAR(20),
+    major VARCHAR(100),
+    year_of_study INT,
+    FOREIGN KEY (User_id) REFERENCES USER(User_id)
+);
+
+CREATE TABLE EMPLOYEE (
+    User_id INT PRIMARY KEY,
+    emp_id VARCHAR(50) UNIQUE NOT NULL,
+    salary DECIMAL(10,2),
+    gender VARCHAR(10),
+    aadhaar VARCHAR(12),
+    FOREIGN KEY (User_id) REFERENCES USER(User_id)
+);
+
+CREATE TABLE CUSTOMER_SUPPORT (
+    User_id INT PRIMARY KEY,
+    FOREIGN KEY (User_id) REFERENCES EMPLOYEE(User_id)
+);
+
+CREATE TABLE ADMIN (
+    User_id INT PRIMARY KEY,
+    FOREIGN KEY (User_id) REFERENCES EMPLOYEE(User_id)
+);
+
+CREATE TABLE SUPER_ADMIN (
+    id INT PRIMARY KEY CHECK (id = 1),
+    User_id INT UNIQUE,
+    FOREIGN KEY (User_id) REFERENCES ADMIN(User_id)
+);
+
+CREATE TABLE DEPARTMENT (
+    Dept_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    University_id INT NOT NULL,
+    FOREIGN KEY (University_id) REFERENCES UNIVERSITY(University_id)
+);
+
+CREATE TABLE INSTRUCTOR (
+    Instructor_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    University_id INT,
+    Dept_id INT,
+    FOREIGN KEY (University_id) REFERENCES UNIVERSITY(University_id),
+    FOREIGN KEY (Dept_id) REFERENCES DEPARTMENT(Dept_id)
+);
+
+CREATE TABLE COURSE (
+    Course_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    semester VARCHAR(20),
+    year INT
+);
+
+CREATE TABLE TEACHES (
+    Instructor_id INT,
+    Course_id INT,
+    PRIMARY KEY (Instructor_id, Course_id),
+    FOREIGN KEY (Instructor_id) REFERENCES INSTRUCTOR(Instructor_id),
+    FOREIGN KEY (Course_id) REFERENCES COURSE(Course_id)
+);
+
+CREATE TABLE OFFERS (
+    Dept_id INT,
+    Course_id INT,
+    PRIMARY KEY (Dept_id, Course_id),
+    FOREIGN KEY (Dept_id) REFERENCES DEPARTMENT(Dept_id),
+    FOREIGN KEY (Course_id) REFERENCES COURSE(Course_id)
+);
+
+CREATE TABLE BOOK (
+    Book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(300) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    isbn VARCHAR(20),
+    publisher VARCHAR(200),
+    pub_date DATE,
+    edition INT DEFAULT 1,
+    language VARCHAR(50) DEFAULT 'English',
+    format VARCHAR(20) DEFAULT 'hardcover',
+    type VARCHAR(10) DEFAULT 'new',
+    purchase_option VARCHAR(10) DEFAULT 'buy',
+    quantity INT DEFAULT 0,
+    category VARCHAR(100),
+    subcategory VARCHAR(100),
+    authors VARCHAR(255),
+    keywords VARCHAR(255)
+);
+
+CREATE TABLE USES (
+    Course_id INT,
+    Book_id INT,
+    PRIMARY KEY (Course_id, Book_id),
+    FOREIGN KEY (Course_id) REFERENCES COURSE(Course_id),
+    FOREIGN KEY (Book_id) REFERENCES BOOK(Book_id)
+);
+
+CREATE TABLE REVIEW (
+    Review_id INT AUTO_INCREMENT PRIMARY KEY,
+    rating INT CHECK(rating >= 1 AND rating <= 5),
+    review_text VARCHAR(255),
+    date_posted DATETIME DEFAULT CURRENT_TIMESTAMP,
+    User_id INT NOT NULL,
+    Book_id INT NOT NULL,
+    FOREIGN KEY (User_id) REFERENCES STUDENT(User_id),
+    FOREIGN KEY (Book_id) REFERENCES BOOK(Book_id)
+);
+
+CREATE TABLE CART (
+    Cart_id INT AUTO_INCREMENT PRIMARY KEY,
+    date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+    User_id INT UNIQUE NOT NULL,
+    FOREIGN KEY (User_id) REFERENCES STUDENT(User_id)
+);
+
+CREATE TABLE CART_BOOK (
+    Cart_id INT,
+    Book_id INT,
+    quantity INT DEFAULT 1,
+    PRIMARY KEY (Cart_id, Book_id),
+    FOREIGN KEY (Cart_id) REFERENCES CART(Cart_id),
+    FOREIGN KEY (Book_id) REFERENCES BOOK(Book_id)
+);
+
+CREATE TABLE ORDERS (
+    Order_id INT AUTO_INCREMENT PRIMARY KEY,
+    date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_fulfilled DATETIME,
+    status VARCHAR(30) DEFAULT 'new',
+    shipping_type VARCHAR(20) DEFAULT 'standard',
+    cc_number VARCHAR(20),
+    cc_expiry VARCHAR(10),
+    cc_holder VARCHAR(200),
+    cc_type VARCHAR(20),
+    User_id INT NOT NULL,
+    FOREIGN KEY (User_id) REFERENCES STUDENT(User_id)
+);
+
+CREATE TABLE ORDER_BOOK (
+    Order_id INT,
+    Book_id INT,
+    quantity INT DEFAULT 1,
+    price DECIMAL(10,2),
+    PRIMARY KEY (Order_id, Book_id),
+    FOREIGN KEY (Order_id) REFERENCES ORDERS(Order_id),
+    FOREIGN KEY (Book_id) REFERENCES BOOK(Book_id)
+);
+
+CREATE TABLE TICKET_CATEGORY (
+    Category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE TICKET (
+    Ticket_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(300) NOT NULL,
+    description VARCHAR(255),
+    solution VARCHAR(255),
+    status VARCHAR(20) DEFAULT 'new',
+    date_logged DATETIME DEFAULT CURRENT_TIMESTAMP,
+    completion_date DATETIME,
+    Category_id INT,
+    created_by INT NOT NULL,
+    assigned_to INT,
+    FOREIGN KEY (Category_id) REFERENCES TICKET_CATEGORY(Category_id),
+    FOREIGN KEY (created_by) REFERENCES USER(User_id),
+    FOREIGN KEY (assigned_to) REFERENCES ADMIN(User_id)
+);
+
+CREATE TABLE TICKET_STATUS_LOG (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    new_status VARCHAR(20) NOT NULL,
+    change_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Ticket_id INT NOT NULL,
+    changed_by INT NOT NULL,
+    FOREIGN KEY (Ticket_id) REFERENCES TICKET(Ticket_id),
+    FOREIGN KEY (changed_by) REFERENCES USER(User_id)
+);
+
+INSERT INTO TICKET_CATEGORY (name) VALUES ('user profile');
+INSERT INTO TICKET_CATEGORY (name) VALUES ('products');
+INSERT INTO TICKET_CATEGORY (name) VALUES ('cart');
+INSERT INTO TICKET_CATEGORY (name) VALUES ('orders');
+INSERT INTO TICKET_CATEGORY (name) VALUES ('other');
+
+SET FOREIGN_KEY_CHECKS = 1;

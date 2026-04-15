@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Ticket #{{ ticket['Ticket_id'] }} - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Ticket #{{ ticket['Ticket_id'] }}: {{ ticket['title'] }}</h2>
+        <p><a href="{{ url_for('admin_tickets') }}">&larr; Back to Tickets</a></p>
+    </div>
+
+    <div class="grid grid-2">
+        <div class="card">
+            <h4 style="margin-bottom:12px;">Ticket Information</h4>
+            <table style="box-shadow:none;border:1px solid var(--border);">
+                <tr><td style="font-weight:600;width:140px;">Status</td><td><span class="badge badge-{{ ticket['status'] }}">{{ ticket['status'] }}</span></td></tr>
+                <tr><td style="font-weight:600;">Category</td><td>{{ ticket['category_name'] }}</td></tr>
+                <tr><td style="font-weight:600;">Created By</td><td>{{ ticket['creator_name'] }}</td></tr>
+                <tr><td style="font-weight:600;">Date Logged</td><td>{{ ticket['date_logged'] }}</td></tr>
+                {% if ticket['completion_date'] %}<tr><td style="font-weight:600;">Completed</td><td>{{ ticket['completion_date'] }}</td></tr>{% endif %}
+            </table>
+
+            <h4 style="margin:20px 0 8px;">Problem Description</h4>
+            <p style="padding:12px;background:#f8f9fa;border-radius:var(--radius);font-size:0.9rem;">{{ ticket['description'] or 'No description provided.' }}</p>
+
+            {% if ticket['solution'] %}
+            <h4 style="margin:20px 0 8px;">Solution</h4>
+            <p style="padding:12px;background:#d4edda;border-radius:var(--radius);font-size:0.9rem;">{{ ticket['solution'] }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {% if ticket['status'] != 'new' %}
+            <div class="card">
+                <h4 style="margin-bottom:12px;">Update Ticket</h4>
+                <form method="post">
+                    <div class="form-group">
+                        <label>Change Status</label>
+                        <select name="status">
+                            <option value="">-- Keep Current --</option>
+                            {% if ticket['status'] == 'assigned' %}
+                            <option value="in-process">In Process</option>
+                            {% endif %}
+                            {% if ticket['status'] in ('assigned', 'in-process') %}
+                            <option value="completed">Completed</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Solution Description</label>
+                        <textarea name="solution" placeholder="Describe the solution...">{{ ticket['solution'] or '' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Ticket</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                Admins cannot modify tickets in "new" status. This ticket must first be assigned by customer support.
+            </div>
+            {% endif %}
+
+            <div class="card">
+                <h4 style="margin-bottom:12px;">Status History</h4>
+                {% for log in logs %}
+                <div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:0.9rem;">
+                    <span class="badge badge-{{ log['new_status'] }}">{{ log['new_status'] }}</span>
+                    <span style="margin-left:8px;">by {{ log['changed_by_name'] }}</span>
+                    <span style="float:right;color:var(--text-light);">{{ log['change_time'] }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

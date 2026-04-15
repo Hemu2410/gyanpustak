@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Admin Dashboard</h2>
+        <p>System overview and management</p>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <h3>{{ book_count }}</h3>
+            <p>Total Books</p>
+        </div>
+        <div class="stat-card" style="border-left-color:var(--info);">
+            <h3>{{ student_count }}</h3>
+            <p>Students</p>
+        </div>
+        <div class="stat-card" style="border-left-color:var(--secondary);">
+            <h3>{{ order_count }}</h3>
+            <p>Total Orders</p>
+        </div>
+        <div class="stat-card" style="border-left-color:var(--accent);">
+            <h3>{{ ticket_count }}</h3>
+            <p>Active Tickets</p>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <div class="card">
+            <h3 style="margin-bottom:16px;">Quick Actions</h3>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <a href="{{ url_for('admin_add_book') }}" class="btn btn-primary">Add New Book</a>
+                <a href="{{ url_for('admin_books') }}" class="btn btn-outline">Manage Books</a>
+                <a href="{{ url_for('admin_tickets') }}" class="btn btn-outline">Manage Tickets</a>
+                <a href="{{ url_for('admin_orders') }}" class="btn btn-outline">Manage Orders</a>
+                <a href="{{ url_for('admin_courses') }}" class="btn btn-outline">Manage Courses</a>
+                <a href="{{ url_for('admin_universities') }}" class="btn btn-outline">Manage Universities</a>
+            </div>
+        </div>
+        <div class="card">
+            <h3 style="margin-bottom:16px;">Recent Orders</h3>
+            {% if recent_orders %}
+            <table style="box-shadow:none;">
+                <thead><tr><th>ID</th><th>Student</th><th>Total</th><th>Status</th></tr></thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>#{{ order['Order_id'] }}</td>
+                        <td>{{ order['student_name'] }}</td>
+                        <td>Rs. {{ "%.2f"|format(order['total'] or 0) }}</td>
+                        <td><span class="badge badge-{{ order['status'] }}">{{ order['status'] }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:var(--text-light);">No orders yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

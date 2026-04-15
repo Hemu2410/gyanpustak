@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GyanPustak{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="{{ url_for('home') }}" class="logo">Gyan<span>Pustak</span></a>
+            <div class="nav-links">
+                <a href="{{ url_for('books') }}">Books</a>
+                {% if session.get('user_id') %}
+                    {% if session.get('user_type') == 'student' %}
+                        <a href="{{ url_for('cart') }}">Cart</a>
+                        <a href="{{ url_for('orders') }}">Orders</a>
+                        <a href="{{ url_for('student_tickets') }}">Tickets</a>
+                    {% elif session.get('user_type') == 'customer_support' %}
+                        <a href="{{ url_for('support_dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('support_tickets') }}">Tickets</a>
+                    {% elif session.get('user_type') in ('admin', 'super_admin') %}
+                        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('admin_books') }}">Manage Books</a>
+                        <a href="{{ url_for('admin_tickets') }}">Tickets</a>
+                        <a href="{{ url_for('admin_orders') }}">Orders</a>
+                        <a href="{{ url_for('admin_courses') }}">Courses</a>
+                        {% if session.get('user_type') == 'super_admin' %}
+                            <a href="{{ url_for('admin_employees') }}">Employees</a>
+                        {% endif %}
+                    {% endif %}
+                    <a href="{{ url_for('profile') }}">{{ session.get('user_name', 'Profile') }}</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.5);">Login</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 10px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <div class="container">
+            <p>GyanPustak - Online Textbook Platform | DBS Lab Project</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}My Tickets - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+            <h2>My Trouble Tickets</h2>
+            <p>Report issues with the platform</p>
+        </div>
+        <button onclick="document.getElementById('ticketModal').classList.add('active')" class="btn btn-primary">Create Ticket</button>
+    </div>
+
+    {% if tickets %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>#{{ ticket['Ticket_id'] }}</td>
+                <td>{{ ticket['title'] }}</td>
+                <td>{{ ticket['category_name'] }}</td>
+                <td><span class="badge badge-{{ ticket['status'].replace(' ', '-') }}">{{ ticket['status'] }}</span></td>
+                <td>{{ ticket['date_logged'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <h3>No tickets yet</h3>
+        <p>Create a ticket if you face any issues</p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="modal-overlay" id="ticketModal">
+    <div class="modal">
+        <h3>Create Trouble Ticket</h3>
+        <form method="post" action="{{ url_for('create_ticket') }}">
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category_id" required>
+                    {% for cat in categories %}
+                    <option value="{{ cat['Category_id'] }}">{{ cat['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" required placeholder="Brief description of the issue">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" required placeholder="Describe the problem in detail..."></textarea>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button type="button" onclick="document.getElementById('ticketModal').classList.remove('active')" class="btn btn-outline">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit Ticket</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

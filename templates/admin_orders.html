@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Manage Orders - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Manage Orders</h2>
+        <p>Update order statuses</p>
+    </div>
+
+    {% if orders %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Shipping</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order['Order_id'] }}</td>
+                <td>{{ order['student_name'] }}</td>
+                <td>{{ order['date_created'] }}</td>
+                <td>{{ order['item_count'] }}</td>
+                <td>Rs. {{ "%.2f"|format(order['total'] or 0) }}</td>
+                <td>{{ order['shipping_type'] }}</td>
+                <td><span class="badge badge-{{ order['status'] }}">{{ order['status'] }}</span></td>
+                <td>
+                    {% if order['status'] not in ('shipped', 'canceled') %}
+                    <form method="post" action="{{ url_for('admin_update_order', order_id=order['Order_id']) }}" style="display:flex;gap:4px;">
+                        <select name="status" style="padding:4px 6px;font-size:0.8rem;border:1px solid var(--border);border-radius:4px;">
+                            <option value="processed">Processed</option>
+                            <option value="awaiting shipping">Awaiting Shipping</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="canceled">Canceled</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                    </form>
+                    {% else %}
+                    <span style="font-size:0.8rem;color:var(--text-light);">Final</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <h3>No orders yet</h3>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

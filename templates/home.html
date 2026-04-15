@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}GyanPustak - Online Textbook Platform{% endblock %}
+{% block content %}
+<div class="hero">
+    <h1>Welcome to GyanPustak</h1>
+    <p>Your one-stop platform for buying and renting textbooks. New books, used books, and e-books for college students.</p>
+    <a href="{{ url_for('books') }}" class="btn btn-secondary btn-lg">Browse Books</a>
+    {% if not session.get('user_id') %}
+        <a href="{{ url_for('register') }}" class="btn btn-outline btn-lg" style="color:#fff;border-color:#fff;margin-left:10px;">Sign Up</a>
+    {% endif %}
+</div>
+
+<div class="container" style="padding: 50px 0;">
+    <h2 style="text-align:center;margin-bottom:30px;color:var(--primary-dark);">Top Rated Books</h2>
+    <div class="grid grid-4">
+        {% for book in books %}
+        <div class="book-card">
+            <div class="book-cover-placeholder" style="min-height:150px;font-size:0.9rem;">
+                {{ book['title'][:30] }}{% if book['title']|length > 30 %}...{% endif %}
+            </div>
+            <div class="book-info">
+                <div class="book-title">{{ book['title'] }}</div>
+                <div class="book-author">{{ book['authors'] or 'Unknown Author' }}</div>
+                <div class="book-meta">
+                    <span>{{ book['type'] }}</span>
+                    <span>{{ book['format'] }}</span>
+                    <span>{{ book['purchase_option'] }}</span>
+                </div>
+                <div style="margin-bottom:8px;">
+                    <span class="stars">
+                        {% set avg = book['avg_rating']|round|int %}
+                        {% for i in range(5) %}
+                            {% if i < avg %}&#9733;{% else %}<span class="empty">&#9733;</span>{% endif %}
+                        {% endfor %}
+                    </span>
+                    <small style="color:var(--text-light);">({{ book['review_count'] }})</small>
+                </div>
+                <div class="book-price">Rs. {{ "%.2f"|format(book['price']) }}</div>
+                <div class="book-actions">
+                    <a href="{{ url_for('book_detail', book_id=book['Book_id']) }}" class="btn btn-outline btn-sm">View</a>
+                    {% if session.get('user_type') == 'student' %}
+                    <form action="{{ url_for('add_to_cart', book_id=book['Book_id']) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div style="background:var(--primary-dark);color:#fff;padding:50px 0;text-align:center;">
+    <div class="container">
+        <div class="grid grid-3">
+            <div>
+                <h3 style="font-size:2rem;margin-bottom:8px;">Buy & Rent</h3>
+                <p style="opacity:0.8;">New and used textbooks available for purchase or rental</p>
+            </div>
+            <div>
+                <h3 style="font-size:2rem;margin-bottom:8px;">All Formats</h3>
+                <p style="opacity:0.8;">Hardcover, softcover, and electronic formats available</p>
+            </div>
+            <div>
+                <h3 style="font-size:2rem;margin-bottom:8px;">Course Books</h3>
+                <p style="opacity:0.8;">Find required and recommended books for your courses</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

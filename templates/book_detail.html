@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}{{ book['title'] }} - GyanPustak{% endblock %}
+{% block content %}
+<div class="container" style="padding-top:30px;">
+    <a href="{{ url_for('books') }}" style="color:var(--text-light);font-size:0.9rem;">&larr; Back to Books</a>
+
+    <div class="book-detail-layout" style="margin-top:20px;">
+        <div>
+            <div class="book-cover-placeholder">
+                {{ book['title'] }}
+            </div>
+        </div>
+        <div>
+            <h1 style="font-size:1.8rem;margin-bottom:8px;">{{ book['title'] }}</h1>
+            <p style="font-size:1.1rem;color:var(--text-light);margin-bottom:16px;">by {{ book['authors'] or 'Unknown Author' }}</p>
+
+            <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+                <span class="badge badge-new">{{ book['type'] }}</span>
+                <span class="badge badge-assigned">{{ book['format'] }}</span>
+                <span class="badge badge-in-process">{{ book['purchase_option'] }}</span>
+            </div>
+
+            <div class="book-price" style="font-size:2rem;margin-bottom:20px;">Rs. {{ "%.2f"|format(book['price']) }}</div>
+
+            <div style="margin-bottom:8px;">
+                <span class="stars" style="font-size:1.3rem;">
+                    {% set avg = book['avg_rating']|round|int %}
+                    {% for i in range(5) %}
+                        {% if i < avg %}&#9733;{% else %}<span class="empty">&#9733;</span>{% endif %}
+                    {% endfor %}
+                </span>
+                <span style="color:var(--text-light);margin-left:8px;">{{ "%.1f"|format(book['avg_rating']) }} / 5 ({{ book['review_count'] }} reviews)</span>
+            </div>
+
+            <table style="box-shadow:none;border:1px solid var(--border);margin:20px 0;">
+                <tr><td style="font-weight:600;width:150px;">ISBN</td><td>{{ book['isbn'] or 'N/A' }}</td></tr>
+                <tr><td style="font-weight:600;">Publisher</td><td>{{ book['publisher'] or 'N/A' }}</td></tr>
+                <tr><td style="font-weight:600;">Edition</td><td>{{ book['edition'] }}</td></tr>
+                <tr><td style="font-weight:600;">Language</td><td>{{ book['language'] }}</td></tr>
+                <tr><td style="font-weight:600;">Category</td><td>{{ book['category'] }}{% if book['subcategory'] %} / {{ book['subcategory'] }}{% endif %}</td></tr>
+                <tr><td style="font-weight:600;">Availability</td><td>{% if book['quantity'] > 0 %}{{ book['quantity'] }} in stock{% else %}<span style="color:var(--danger);">Out of Stock</span>{% endif %}</td></tr>
+                {% if book['keywords'] %}<tr><td style="font-weight:600;">Keywords</td><td>{{ book['keywords'] }}</td></tr>{% endif %}
+            </table>
+
+            {% if session.get('user_type') == 'student' and book['quantity'] > 0 %}
+            <form action="{{ url_for('add_to_cart', book_id=book['Book_id']) }}" method="post">
+                <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if courses %}
+    <div class="card" style="margin-top:30px;">
+        <h3 style="margin-bottom:16px;">Required/Recommended for Courses</h3>
+        <table>
+            <thead><tr><th>Course</th><th>Department</th><th>Semester</th></tr></thead>
+            <tbody>
+                {% for c in courses %}
+                <tr><td>{{ c['name'] }}</td><td>{{ c['dept_name'] }}</td><td>{{ c['semester'] }} {{ c['year'] }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div style="margin-top:30px;">
+        <h3 style="margin-bottom:16px;">Reviews ({{ reviews|length }})</h3>
+
+        {% if session.get('user_type') == 'student' %}
+        <div class="card" style="margin-bottom:20px;">
+            <h4 style="margin-bottom:12px;">Write a Review</h4>
+            <form method="post" action="{{ url_for('add_review', book_id=book['Book_id']) }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <select name="rating" required>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="2">2 Stars</option>
+                            <option value="1">1 Star</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Your Review</label>
+                    <textarea name="review_text" placeholder="Write your review here..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% for review in reviews %}
+        <div class="review-item">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <strong>{{ review['reviewer_name'] }}</strong>
+                <span class="stars">
+                    {% for i in range(5) %}
+                        {% if i < review['rating'] %}&#9733;{% else %}<span class="empty">&#9733;</span>{% endif %}
+                    {% endfor %}
+                </span>
+            </div>
+            <p style="margin-top:8px;color:var(--text-light);">{{ review['review_text'] or 'No written review.' }}</p>
+            <small style="color:#aaa;">{{ review['date_posted'] }}</small>
+        </div>
+        {% else %}
+        <p style="color:var(--text-light);">No reviews yet. Be the first to review!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

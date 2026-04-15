@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Login - GyanPustak{% endblock %}
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Log in to your GyanPustak account</p>
+        <form method="post">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="Enter your password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;margin-top:10px;">Log In</button>
+        </form>
+        <p style="text-align:center;margin-top:20px;color:var(--text-light);">
+            Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+        </p>
+        <!-- <div style="margin-top:20px;padding:16px;background:#f8f9fa;border-radius:var(--radius);font-size:0.8rem;">
+            <strong>Demo Accounts:</strong><br>
+            Student: rahul@student.com / student123<br>
+            Support: support@gyanpustak.com / support123<br>
+            Admin: admin@gyanpustak.com / admin123<br>
+            Super Admin: superadmin@gyanpustak.com / admin123
+        </div> -->
+    </div>
+</div>
+{% endblock %}

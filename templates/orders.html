@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}My Orders - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>My Orders</h2>
+    </div>
+
+    {% if orders %}
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Shipping</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order['Order_id'] }}</td>
+                <td>{{ order['date_created'] }}</td>
+                <td>{{ order['item_count'] }} item(s)</td>
+                <td>Rs. {{ "%.2f"|format(order['total'] or 0) }}</td>
+                <td>{{ order['shipping_type'] }}</td>
+                <td>
+                    <span class="badge badge-{{ order['status'].replace(' ', '-') }}">{{ order['status'] }}</span>
+                </td>
+                <td>
+                    <a href="{{ url_for('order_detail', order_id=order['Order_id']) }}" class="btn btn-outline btn-sm">View</a>
+                    {% if order['status'] not in ('shipped', 'canceled') %}
+                    <form action="{{ url_for('cancel_order', order_id=order['Order_id']) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Cancel this order?')">Cancel</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <h3>No orders yet</h3>
+        <p>Your order history will appear here</p>
+        <a href="{{ url_for('books') }}" class="btn btn-primary" style="margin-top:16px;">Browse Books</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

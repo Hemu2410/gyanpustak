@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Add Book - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Add New Book</h2>
+        <p><a href="{{ url_for('admin_books') }}">&larr; Back to Books</a></p>
+    </div>
+
+    <div class="card" style="max-width:700px;">
+        <form method="post">
+            <div class="form-group">
+                <label>Title *</label>
+                <input type="text" name="title" required placeholder="Book title">
+            </div>
+            <div class="form-group">
+                <label>Authors</label>
+                <input type="text" name="authors" placeholder="Author names (comma separated)">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Price *</label>
+                    <input type="number" name="price" required step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>ISBN</label>
+                    <input type="text" name="isbn" placeholder="ISBN number">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Publisher</label>
+                    <input type="text" name="publisher" placeholder="Publisher name">
+                </div>
+                <div class="form-group">
+                    <label>Publication Date</label>
+                    <input type="date" name="pub_date">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Edition</label>
+                    <input type="number" name="edition" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Language</label>
+                    <input type="text" name="language" value="English">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Format</label>
+                    <select name="format">
+                        <option value="hardcover">Hardcover</option>
+                        <option value="softcover">Softcover</option>
+                        <option value="electronic">Electronic</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select name="type">
+                        <option value="new">New</option>
+                        <option value="used">Used</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Purchase Option</label>
+                    <select name="purchase_option">
+                        <option value="buy">Buy</option>
+                        <option value="rent">Rent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" value="0" min="0">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" name="category" placeholder="e.g. Computer Science">
+                </div>
+                <div class="form-group">
+                    <label>Subcategory</label>
+                    <input type="text" name="subcategory" placeholder="e.g. Algorithms">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Keywords</label>
+                <input type="text" name="keywords" placeholder="Comma separated keywords for search">
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Add Book</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

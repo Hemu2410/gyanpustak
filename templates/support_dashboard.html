@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Support Dashboard - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Customer Support Dashboard</h2>
+        <p>Manage trouble tickets and customer issues</p>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <h3>{{ new_count }}</h3>
+            <p>New Tickets</p>
+        </div>
+        <div class="stat-card" style="border-left-color:var(--secondary);">
+            <h3>{{ assigned_count }}</h3>
+            <p>Assigned Tickets</p>
+        </div>
+        <div class="stat-card" style="border-left-color:var(--info);">
+            <h3>{{ total_count }}</h3>
+            <p>Total Tickets</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3>Recent Tickets</h3>
+            <a href="{{ url_for('support_tickets') }}" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Created By</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in recent_tickets %}
+                <tr>
+                    <td>#{{ ticket['Ticket_id'] }}</td>
+                    <td>{{ ticket['title'] }}</td>
+                    <td>{{ ticket['category_name'] }}</td>
+                    <td>{{ ticket['creator_name'] }}</td>
+                    <td><span class="badge badge-{{ ticket['status'] }}">{{ ticket['status'] }}</span></td>
+                    <td>{{ ticket['date_logged'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
