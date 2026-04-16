@@ -662,10 +662,29 @@ def admin_universities():
 @login_required
 @role_required('admin', 'super_admin')
 def admin_add_university():
-    execute_db("INSERT INTO UNIVERSITY (name, address, rep_first_name, rep_last_name, rep_email, rep_phone) VALUES (%s,%s,%s,%s,%s,%s)",
+    execute_db("INSERT INTO UNIVERSITY (name, address, rep_first_name, rep_last_name, rep_email, rep_phone) VALUES (?,?,?,?,?,?)",
               [request.form['name'], request.form.get('address',''), request.form.get('rep_first_name',''),
                request.form.get('rep_last_name',''), request.form.get('rep_email',''), request.form.get('rep_phone','')])
     flash('University added!', 'success')
+    return redirect(url_for('admin_universities'))
+
+
+@app.route('/admin/departments/add', methods=['POST'])
+@login_required
+@role_required('admin', 'super_admin')
+def admin_add_department():
+    name = request.form['name'].strip()
+    university_id = request.form['university_id']
+
+    existing = query_db("SELECT Dept_id FROM DEPARTMENT WHERE name = ? AND University_id = ?",
+                       [name, university_id], one=True)
+    if existing:
+        flash('This department already exists for the selected university.', 'warning')
+    else:
+        execute_db("INSERT INTO DEPARTMENT (name, University_id) VALUES (?,?)",
+                  [name, university_id])
+        flash('Department added successfully!', 'success')
+
     return redirect(url_for('admin_universities'))
 
 
@@ -759,6 +778,58 @@ def admin_add_employee():
     flash(f'Employee {name} added as {role}!', 'success')
     return redirect(url_for('admin_employees'))
 
+
+@app.route('/admin/instructors')
+@login_required
+@role_required('admin', 'super_admin')
+def admin_instructors():
+    instructors = query_db("""SELECT i.*, u.name as university_name, d.name as department_name,
+                              GROUP_CONCAT(DISTINCT c.name) as courses
+                              FROM INSTRUCTOR i
+                              LEFT JOIN UNIVERSITY u ON i.University_id = u.University_id
+                              LEFT JOIN DEPARTMENT d ON i.Dept_id = d.Dept_id
+                              LEFT JOIN TEACHES t ON i.Instructor_id = t.Instructor_id
+                              LEFT JOIN COURSE c ON t.Course_id = c.Course_id
+                              GROUP BY i.Instructor_id
+                              ORDER BY i.name""")
+    universities = query_db("SELECT * FROM UNIVERSITY ORDER BY name")
+    departments = query_db("""SELECT d.*, u.name as university_name
+                              FROM DEPARTMENT d
+                              JOIN UNIVERSITY u ON d.University_id = u.University_id
+                              ORDER BY u.name, d.name""")
+    courses = query_db("SELECT * FROM COURSE ORDER BY name")
+    return render_template('admin_instructors.html', instructors=instructors,
+                         universities=universities, departments=departments, courses=courses)
+
+
+@app.route('/admin/instructors/add', methods=['POST'])
+@login_required
+@role_required('admin', 'super_admin')
+def admin_add_instructor():
+    name = request.form['name']
+    university_id = request.form.get('university_id') or None
+    dept_id = request.form.get('dept_id') or None
+    existing_course_id = request.form.get('course_id') or None
+    new_course_name = request.form.get('new_course_name', '').strip()
+    course_id = existing_course_id
+
+    instructor_id = execute_db("INSERT INTO INSTRUCTOR (name, University_id, Dept_id) VALUES (?,?,?)",
+                              [name, university_id, dept_id])
+
+    if new_course_name:
+        course_id = execute_db("INSERT INTO COURSE (name, semester, year) VALUES (?,?,?)",
+                              [new_course_name, request.form.get('new_course_semester', ''),
+                               int(request.form.get('new_course_year') or 2025)])
+        if dept_id:
+            execute_db("INSERT INTO OFFERS (Dept_id, Course_id) VALUES (?,?)",
+                      [dept_id, course_id])
+
+    if course_id:
+        execute_db("INSERT INTO TEACHES (Instructor_id, Course_id) VALUES (?,?)",
+                  [instructor_id, course_id])
+
+    flash('Instructor added successfully!', 'success')
+    return redirect(url_for('admin_instructors'))
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

@@ -26,6 +26,7 @@
                         <a href="{{ url_for('admin_tickets') }}">Tickets</a>
                         <a href="{{ url_for('admin_orders') }}">Orders</a>
                         <a href="{{ url_for('admin_courses') }}">Courses</a>
+                        <a href="{{ url_for('admin_instructors') }}">Instructors</a>
                         {% if session.get('user_type') == 'super_admin' %}
                             <a href="{{ url_for('admin_employees') }}">Employees</a>
                         {% endif %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Manage Instructors - GyanPustak{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+            <h2>Manage Instructors</h2>
+            <p>{{ instructors|length }} instructors registered</p>
+        </div>
+        <button onclick="document.getElementById('instructorModal').classList.add('active')" class="btn btn-primary">Add Instructor</button>
+    </div>
+
+    {% if instructors %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>University</th>
+                <th>Department</th>
+                <th>Courses Taught</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for instructor in instructors %}
+            <tr>
+                <td>{{ instructor['Instructor_id'] }}</td>
+                <td>{{ instructor['name'] }}</td>
+                <td>{{ instructor['university_name'] or '-' }}</td>
+                <td>{{ instructor['department_name'] or '-' }}</td>
+                <td>{{ instructor['courses'] or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <h3>No instructors yet</h3>
+        <p>Add instructors and connect them with universities, departments, and courses.</p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="modal-overlay" id="instructorModal">
+    <div class="modal">
+        <h3>Add Instructor</h3>
+        <form method="post" action="{{ url_for('admin_add_instructor') }}">
+            <div class="form-group">
+                <label>Instructor Name</label>
+                <input type="text" name="name" required placeholder="Instructor full name">
+            </div>
+            <div class="form-group">
+                <label>University</label>
+                <select name="university_id">
+                    <option value="">-- Select University --</option>
+                    {% for university in universities %}
+                    <option value="{{ university['University_id'] }}">{{ university['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <select name="dept_id">
+                    <option value="">-- Select Department --</option>
+                    {% for department in departments %}
+                    <option value="{{ department['Dept_id'] }}">{{ department['name'] }} - {{ department['university_name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Existing Course Taught</label>
+                <select name="course_id">
+                    <option value="">-- Optional --</option>
+                    {% for course in courses %}
+                    <option value="{{ course['Course_id'] }}">{{ course['name'] }} ({{ course['semester'] or 'Semester N/A' }} {{ course['year'] or '' }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="padding:12px;margin-bottom:16px;background:#f8f9fa;border:1px solid var(--border);border-radius:var(--radius);font-size:0.9rem;color:var(--text-light);">
+                If the instructor teaches a course that is not listed above, create it here. A new course will be linked to the selected department and assigned to this instructor.
+            </div>
+            <div class="form-group">
+                <label>New Course Name</label>
+                <input type="text" name="new_course_name" placeholder="Leave blank if using an existing course">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>New Course Semester</label>
+                    <select name="new_course_semester">
+                        <option value="">-- Select --</option>
+                        <option value="Fall">Fall</option>
+                        <option value="Spring">Spring</option>
+                        <option value="Summer">Summer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>New Course Year</label>
+                    <input type="number" name="new_course_year" value="2025">
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button type="button" onclick="document.getElementById('instructorModal').classList.remove('active')" class="btn btn-outline">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Instructor</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
