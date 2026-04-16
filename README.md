@@ -45,8 +45,8 @@ The application is built using Flask (Python) and MySQL, with a modular backend 
 
 ## 🔹 Project Structure
 
+```
 PROJECT_GYANPUSTAK/
-
 │
 ├── app.py  
 ├── requirements.txt  
@@ -84,10 +84,11 @@ PROJECT_GYANPUSTAK/
 │   ├── admin_courses.html  
 │   ├── admin_orders.html  
 │   ├── admin_employees.html  
-│   ├── admin_universities.html 
-│   ├── admin_instructors.html
+│   ├── admin_universities.html  
+│   ├── admin_instructors.html  
 │   ├── admin_tickets.html  
 │   └── admin_ticket_detail.html  
+```
 
 ---
 
@@ -108,34 +109,42 @@ PROJECT_GYANPUSTAK/
 ## 🔹 Setup Instructions
 
 ### 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/gyanpustak-project.git  
-cd gyanpustak-project  
+```
+git clone https://github.com/YOUR_USERNAME/gyanpustak-project.git
+cd gyanpustak-project
+```
 
 ### 2. Install dependencies
-pip install -r requirements.txt  
+```
+pip install -r requirements.txt
+```
 
 ### 3. Configure environment variables
 
 Create a `.env` file:
 
-DB_HOST=localhost  
-DB_USER=root  
-DB_PASSWORD=yourpassword  
-DB_NAME=gyanpustak  
-SESSION_SECRET=your_secret  
+```
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=yourpassword
+DB_NAME=gyanpustak
+SESSION_SECRET=your_secret
+```
 
 ### 4. Setup Database
 
-Open MySQL and run:
+```
+CREATE DATABASE gyanpustak;
+USE gyanpustak;
 
-CREATE DATABASE gyanpustak;  
-USE gyanpustak;  
-
-SOURCE database/schema.sql;  
-SOURCE database/seed.sql;  
+SOURCE database/schema.sql;
+SOURCE database/seed.sql;
+```
 
 ### 5. Run the application
-python app.py  
+```
+python app.py
+```
 
 ---
 
