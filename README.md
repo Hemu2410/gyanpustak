@@ -84,7 +84,8 @@ PROJECT_GYANPUSTAK/
 │   ├── admin_courses.html  
 │   ├── admin_orders.html  
 │   ├── admin_employees.html  
-│   ├── admin_universities.html  
+│   ├── admin_universities.html 
+│   ├── admin_instructors.html
 │   ├── admin_tickets.html  
 │   └── admin_ticket_detail.html  
 
