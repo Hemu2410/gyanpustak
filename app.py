@@ -100,7 +100,7 @@ def register():
         password = request.form['password']
         phone = request.form.get('phone', '')
         address = request.form.get('address', '')
-        university_id = request.form.get('university_id') or None
+        university_id = request.form.get('university_id')
         dob = request.form.get('dob', '')
         status = request.form.get('status', 'undergraduate')
         major = request.form.get('major', '')
@@ -111,14 +111,18 @@ def register():
             flash('Email already registered.', 'danger')
             return render_template('register.html', universities=universities)
 
+        if not university_id:
+            flash('University is required for student registration.', 'danger')
+            return render_template('register.html', universities=universities)
+
         hashed = generate_password_hash(password)
         user_id = execute_db(
-            "INSERT INTO USER (name, Email, password, phone, address, University_id, user_type) VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            [name, email, hashed, phone, address, university_id, 'student']
+            "INSERT INTO USER (name, Email, password, phone, address, user_type) VALUES (%s,%s,%s,%s,%s,%s)",
+            [name, email, hashed, phone, address, 'student']
         )
         execute_db(
-            "INSERT INTO STUDENT (User_id, dob, status, major, year_of_study) VALUES (%s,%s,%s,%s,%s)",
-            [user_id, dob, status, major, year]
+            "INSERT INTO STUDENT (User_id, University_id, dob, status, major, year_of_study) VALUES (%s,%s,%s,%s,%s,%s)",
+            [user_id, university_id, dob, status, major, year]
         )
         execute_db("INSERT INTO CART (User_id) VALUES (%s)", [user_id])
 
@@ -366,7 +370,10 @@ def profile():
     user = query_db("SELECT * FROM USER WHERE User_id = %s", [session['user_id']], one=True)
     extra = None
     if session['user_type'] == 'student':
-        extra = query_db("SELECT * FROM STUDENT WHERE User_id = %s", [session['user_id']], one=True)
+        extra = query_db("""SELECT s.*, u.name as university_name
+                            FROM STUDENT s
+                            JOIN UNIVERSITY u ON s.University_id = u.University_id
+                            WHERE s.User_id = %s""", [session['user_id']], one=True)
     elif session['user_type'] in ('customer_support', 'admin', 'super_admin'):
         extra = query_db("SELECT * FROM EMPLOYEE WHERE User_id = %s", [session['user_id']], one=True)
     return render_template('profile.html', user=user, extra=extra)
@@ -459,7 +466,6 @@ def support_create_ticket():
               ['new', ticket_id, session['user_id']])
     flash('Ticket created successfully!', 'success')
     return redirect(url_for('support_tickets'))
-
 
 @app.route('/admin')
 @login_required
@@ -662,7 +668,7 @@ def admin_universities():
 @login_required
 @role_required('admin', 'super_admin')
 def admin_add_university():
-    execute_db("INSERT INTO UNIVERSITY (name, address, rep_first_name, rep_last_name, rep_email, rep_phone) VALUES (?,?,?,?,?,?)",
+    execute_db("INSERT INTO UNIVERSITY (name, address, rep_first_name, rep_last_name, rep_email, rep_phone) VALUES (%s,%s,%s,%s,%s,%s)",
               [request.form['name'], request.form.get('address',''), request.form.get('rep_first_name',''),
                request.form.get('rep_last_name',''), request.form.get('rep_email',''), request.form.get('rep_phone','')])
     flash('University added!', 'success')
@@ -676,12 +682,12 @@ def admin_add_department():
     name = request.form['name'].strip()
     university_id = request.form['university_id']
 
-    existing = query_db("SELECT Dept_id FROM DEPARTMENT WHERE name = ? AND University_id = ?",
+    existing = query_db("SELECT Dept_id FROM DEPARTMENT WHERE name = %s AND University_id = %s",
                        [name, university_id], one=True)
     if existing:
         flash('This department already exists for the selected university.', 'warning')
     else:
-        execute_db("INSERT INTO DEPARTMENT (name, University_id) VALUES (?,?)",
+        execute_db("INSERT INTO DEPARTMENT (name, University_id) VALUES (%s,%s)",
                   [name, university_id])
         flash('Department added successfully!', 'success')
 
@@ -813,19 +819,19 @@ def admin_add_instructor():
     new_course_name = request.form.get('new_course_name', '').strip()
     course_id = existing_course_id
 
-    instructor_id = execute_db("INSERT INTO INSTRUCTOR (name, University_id, Dept_id) VALUES (?,?,?)",
+    instructor_id = execute_db("INSERT INTO INSTRUCTOR (name, University_id, Dept_id) VALUES (%s,%s,%s)",
                               [name, university_id, dept_id])
 
     if new_course_name:
-        course_id = execute_db("INSERT INTO COURSE (name, semester, year) VALUES (?,?,?)",
+        course_id = execute_db("INSERT INTO COURSE (name, semester, year) VALUES (%s,%s,%s)",
                               [new_course_name, request.form.get('new_course_semester', ''),
                                int(request.form.get('new_course_year') or 2025)])
         if dept_id:
-            execute_db("INSERT INTO OFFERS (Dept_id, Course_id) VALUES (?,?)",
+            execute_db("INSERT INTO OFFERS (Dept_id, Course_id) VALUES (%s,%s)",
                       [dept_id, course_id])
 
     if course_id:
-        execute_db("INSERT INTO TEACHES (Instructor_id, Course_id) VALUES (?,?)",
+        execute_db("INSERT INTO TEACHES (Instructor_id, Course_id) VALUES (%s,%s)",
                   [instructor_id, course_id])
 
     flash('Instructor added successfully!', 'success')

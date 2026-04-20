@@ -40,18 +40,18 @@ CREATE TABLE USER (
     password VARCHAR(200) NOT NULL,
     phone VARCHAR(20),
     address VARCHAR(255),
-    University_id INT,
-    user_type VARCHAR(20) NOT NULL DEFAULT 'student',
-    FOREIGN KEY (University_id) REFERENCES UNIVERSITY(University_id)
+    user_type VARCHAR(20) NOT NULL DEFAULT 'student'
 );
 
 CREATE TABLE STUDENT (
     User_id INT PRIMARY KEY,
+    University_id INTEGER NOT NULL,
     dob DATE,
     status VARCHAR(20),
     major VARCHAR(100),
     year_of_study INT,
-    FOREIGN KEY (User_id) REFERENCES USER(User_id)
+    FOREIGN KEY (User_id) REFERENCES USER(User_id),
+    FOREIGN KEY (University_id) REFERENCES UNIVERSITY(University_id)
 );
 
 CREATE TABLE EMPLOYEE (

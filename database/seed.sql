@@ -9,11 +9,11 @@ INSERT INTO UNIVERSITY (name, address, rep_first_name, rep_last_name, rep_email,
 -- =========================
 -- USERS
 -- =========================
-INSERT INTO USER (name, Email, password, phone, address, University_id, user_type) VALUES
-('Super Admin', 'superadmin@gyanpustak.com', 'scrypt:32768:8:1$L8Zg9P2t3LYQgtEB$e4d07ae052f7ff47eb8bc9844df8c122ae8b8957c424107e1ea09212576812d14e2ea81aaac677c76f5d009dc79a9442591462301e54c1ea309ec71c3667c79c', NULL, NULL, NULL, 'super_admin'),
-('Admin User', 'admin@gyanpustak.com', 'scrypt:32768:8:1$L8Zg9P2t3LYQgtEB$e4d07ae052f7ff47eb8bc9844df8c122ae8b8957c424107e1ea09212576812d14e2ea81aaac677c76f5d009dc79a9442591462301e54c1ea309ec71c3667c79c', '9000000001', 'GyanPustak HQ', NULL, 'admin'),
-('Support Agent', 'support@gyanpustak.com', 'scrypt:32768:8:1$Jkuft7R0Fs0xJEWw$926276330aee82b022422b1de993029765b07b0b469fcef4dbfd7bad5b45cc567f3afc8b33287514d571dbc23d9186ad13e5279f416b2da8f3060cb0e649c7de', '9000000002', 'GyanPustak HQ', NULL, 'customer_support'),
-('Rahul', 'rahul@student.com', 'scrypt:32768:8:1$zPy4bYjrGVLoLcKN$11f7ea4bff84f750e6185879d2c731a705b39856e1263d6af36b76fb3979e59a11f5f51b2329f5de25e5fa561a68bf3bb888d60cd1646ccd0ae2218a9524189c', '8888888888', 'IIT Bhubaneswar', NULL, 'student');
+INSERT INTO USER (name, Email, password, phone, address, user_type) VALUES
+('Super Admin', 'superadmin@gyanpustak.com', 'scrypt:32768:8:1$L8Zg9P2t3LYQgtEB$e4d07ae052f7ff47eb8bc9844df8c122ae8b8957c424107e1ea09212576812d14e2ea81aaac677c76f5d009dc79a9442591462301e54c1ea309ec71c3667c79c', NULL, NULL, 'super_admin'),
+('Admin User', 'admin@gyanpustak.com', 'scrypt:32768:8:1$L8Zg9P2t3LYQgtEB$e4d07ae052f7ff47eb8bc9844df8c122ae8b8957c424107e1ea09212576812d14e2ea81aaac677c76f5d009dc79a9442591462301e54c1ea309ec71c3667c79c', '9000000001', 'GyanPustak HQ', 'admin'),
+('Support Agent', 'support@gyanpustak.com', 'scrypt:32768:8:1$Jkuft7R0Fs0xJEWw$926276330aee82b022422b1de993029765b07b0b469fcef4dbfd7bad5b45cc567f3afc8b33287514d571dbc23d9186ad13e5279f416b2da8f3060cb0e649c7de', '9000000002', 'GyanPustak HQ', 'customer_support'),
+('Rahul', 'rahul@student.com', 'scrypt:32768:8:1$zPy4bYjrGVLoLcKN$11f7ea4bff84f750e6185879d2c731a705b39856e1263d6af36b76fb3979e59a11f5f51b2329f5de25e5fa561a68bf3bb888d60cd1646ccd0ae2218a9524189c', '8888888888', 'IIT Bhubaneswar', 'student');
 
 -- =========================
 -- EMPLOYEE
@@ -33,8 +33,8 @@ INSERT INTO CUSTOMER_SUPPORT (User_id) VALUES (3);
 -- =========================
 -- STUDENTS
 -- =========================
-INSERT INTO STUDENT (User_id, dob, status, major, year_of_study) VALUES
-(4, '2002-05-15', 'undergraduate', 'Computer Science', 2);
+INSERT INTO STUDENT (User_id, University_id, dob, status, major, year_of_study) VALUES
+(4, 1, '2002-05-15', 'undergraduate', 'Computer Science', 2);
 
 -- =========================
 -- DEPARTMENTS

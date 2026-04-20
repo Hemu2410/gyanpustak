@@ -61,11 +61,9 @@
                 <tr><td style="font-weight:600;">User ID</td><td>{{ user['User_id'] }}</td></tr>
                 <tr><td style="font-weight:600;">Role</td><td>{{ session.get('user_type', '').replace('_', ' ').title() }}</td></tr>
                 <tr><td style="font-weight:600;">Email</td><td>{{ user['Email'] }}</td></tr>
-                {% if user['University_id'] %}
-                <tr><td style="font-weight:600;">University ID</td><td>{{ user['University_id'] }}</td></tr>
-                {% endif %}
                 {% if extra %}
                     {% if session.get('user_type') == 'student' %}
+                    <tr><td style="font-weight:600;">University</td><td>{{ extra['university_name'] }}</td></tr>
                     <tr><td style="font-weight:600;">Date of Birth</td><td>{{ extra['dob'] or 'Not set' }}</td></tr>
                     <tr><td style="font-weight:600;">Major</td><td>{{ extra['major'] or 'Not set' }}</td></tr>
                     <tr><td style="font-weight:600;">Year</td><td>{{ extra['year_of_study'] }}</td></tr>

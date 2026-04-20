@@ -34,7 +34,7 @@
             </div>
             <div class="form-group">
                 <label>University</label>
-                <select name="university_id">
+                <select name="university_id" required>
                     <option value="">-- Select University --</option>
                     {% for uni in universities %}
                     <option value="{{ uni['University_id'] }}">{{ uni['name'] }}</option>
