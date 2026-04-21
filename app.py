@@ -822,17 +822,17 @@ def admin_add_instructor():
     instructor_id = execute_db("INSERT INTO INSTRUCTOR (name, University_id, Dept_id) VALUES (%s,%s,%s)",
                               [name, university_id, dept_id])
 
-    if new_course_name:
-        course_id = execute_db("INSERT INTO COURSE (name, semester, year) VALUES (%s,%s,%s)",
-                              [new_course_name, request.form.get('new_course_semester', ''),
-                               int(request.form.get('new_course_year') or 2025)])
-        if dept_id:
-            execute_db("INSERT INTO OFFERS (Dept_id, Course_id) VALUES (%s,%s)",
-                      [dept_id, course_id])
-
     if course_id:
         execute_db("INSERT INTO TEACHES (Instructor_id, Course_id) VALUES (%s,%s)",
                   [instructor_id, course_id])
+    else:
+        if new_course_name:
+            course_id = execute_db("INSERT INTO COURSE (name, semester, year) VALUES (%s,%s,%s)",
+                                [new_course_name, request.form.get('new_course_semester', ''),
+                                int(request.form.get('new_course_year') or 2025)])
+            if dept_id:
+                execute_db("INSERT INTO OFFERS (Dept_id, Course_id) VALUES (%s,%s)",
+                        [dept_id, course_id])
 
     flash('Instructor added successfully!', 'success')
     return redirect(url_for('admin_instructors'))
