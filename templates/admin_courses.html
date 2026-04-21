@@ -1,13 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}Manage Courses - GyanPustak{% endblock %}
+
 {% block content %}
 <div class="container">
+
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
         <div>
             <h2>Manage Courses</h2>
             <p>{{ courses|length }} courses registered</p>
         </div>
-        <button onclick="document.getElementById('courseModal').classList.add('active')" class="btn btn-primary">Add Course</button>
+
+        <button onclick="document.getElementById('courseModal').classList.add('active')"
+                class="btn btn-primary">
+            Add Course
+        </button>
     </div>
 
     <table>
@@ -21,6 +27,7 @@
                 <th>Instructors</th>
             </tr>
         </thead>
+
         <tbody>
             {% for course in courses %}
             <tr>
@@ -34,62 +41,55 @@
             {% endfor %}
         </tbody>
     </table>
+
 </div>
 
+
+<!-- MODAL -->
 <div class="modal-overlay" id="courseModal">
     <div class="modal">
+
         <h3>Add Course</h3>
+
         <form method="post" action="{{ url_for('admin_add_course') }}">
+
             <div class="form-group">
                 <label>Course Name</label>
-                <input type="text" name="name" required placeholder="Course name">
+                <input type="text" name="name" required placeholder="Enter course name">
             </div>
+
             <div class="form-row">
                 <div class="form-group">
                     <label>Semester</label>
                     <select name="semester">
+                        <option value="">Select</option>
                         <option value="Fall">Fall</option>
                         <option value="Spring">Spring</option>
                         <option value="Summer">Summer</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label>Year</label>
                     <input type="number" name="year" value="2025">
                 </div>
             </div>
-            <div class="form-group">
-                <label>Department</label>
-                <select name="dept_id">
-                    <option value="">-- Select --</option>
-                    {% for dept in departments %}
-                    <option value="{{ dept['Dept_id'] }}">{{ dept['name'] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Instructor</label>
-                <select name="instructor_id">
-                    <option value="">-- Select --</option>
-                    {% for inst in instructors %}
-                    <option value="{{ inst['Instructor_id'] }}">{{ inst['name'] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Required Book</label>
-                <select name="book_id">
-                    <option value="">-- Select --</option>
-                    {% for book in books %}
-                    <option value="{{ book['Book_id'] }}">{{ book['title'] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+
             <div style="display:flex;gap:10px;justify-content:flex-end;">
-                <button type="button" onclick="document.getElementById('courseModal').classList.remove('active')" class="btn btn-outline">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Course</button>
+                <button type="button"
+                        onclick="document.getElementById('courseModal').classList.remove('active')"
+                        class="btn btn-outline">
+                    Cancel
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    Add Course
+                </button>
             </div>
+
         </form>
+
     </div>
 </div>
+
 {% endblock %}

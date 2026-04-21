@@ -717,18 +717,17 @@ def admin_courses():
 @login_required
 @role_required('admin', 'super_admin')
 def admin_add_course():
-    course_id = execute_db("INSERT INTO COURSE (name, semester, year) VALUES (%s,%s,%s)",
-                          [request.form['name'], request.form.get('semester',''), int(request.form.get('year', 2025))])
-    dept_id = request.form.get('dept_id')
-    if dept_id:
-        execute_db("INSERT INTO OFFERS (Dept_id, Course_id) VALUES (%s,%s)", [dept_id, course_id])
-    instructor_id = request.form.get('instructor_id')
-    if instructor_id:
-        execute_db("INSERT INTO TEACHES (Instructor_id, Course_id) VALUES (%s,%s)", [instructor_id, course_id])
-    book_id = request.form.get('book_id')
-    if book_id:
-        execute_db("INSERT INTO USES (Course_id, Book_id) VALUES (%s,%s)", [course_id, book_id])
-    flash('Course added!', 'success')
+
+    name = request.form['name']
+    semester = request.form.get('semester', '')
+    year = int(request.form.get('year', 2025))
+
+    execute_db(
+        "INSERT INTO COURSE (name, semester, year) VALUES (%s,%s,%s)",
+        [name, semester, year]
+    )
+
+    flash('Course added successfully!', 'success')
     return redirect(url_for('admin_courses'))
 
 
@@ -788,15 +787,13 @@ def admin_add_employee():
 @login_required
 @role_required('super_admin')
 def admin_delete_employee(user_id):
-    # Remove role mappings first (important due to FK constraints)
+    
     execute_db("DELETE FROM CUSTOMER_SUPPORT WHERE User_id = %s", [user_id])
     execute_db("DELETE FROM ADMIN WHERE User_id = %s", [user_id])
     execute_db("DELETE FROM SUPER_ADMIN WHERE User_id = %s", [user_id])
 
-    # Remove employee record
     execute_db("DELETE FROM EMPLOYEE WHERE User_id = %s", [user_id])
 
-    # Finally remove user
     execute_db("DELETE FROM USER WHERE User_id = %s", [user_id])
 
     flash('Employee removed successfully!', 'success')
