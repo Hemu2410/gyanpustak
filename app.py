@@ -784,6 +784,50 @@ def admin_add_employee():
     flash(f'Employee {name} added as {role}!', 'success')
     return redirect(url_for('admin_employees'))
 
+@app.route('/admin/employees/<int:user_id>/delete', methods=['POST'])
+@login_required
+@role_required('super_admin')
+def admin_delete_employee(user_id):
+    # Remove role mappings first (important due to FK constraints)
+    execute_db("DELETE FROM CUSTOMER_SUPPORT WHERE User_id = %s", [user_id])
+    execute_db("DELETE FROM ADMIN WHERE User_id = %s", [user_id])
+    execute_db("DELETE FROM SUPER_ADMIN WHERE User_id = %s", [user_id])
+
+    # Remove employee record
+    execute_db("DELETE FROM EMPLOYEE WHERE User_id = %s", [user_id])
+
+    # Finally remove user
+    execute_db("DELETE FROM USER WHERE User_id = %s", [user_id])
+
+    flash('Employee removed successfully!', 'success')
+    return redirect(url_for('admin_employees'))
+
+@app.route('/admin/employees/<int:user_id>/salary', methods=['POST'])
+@login_required
+@role_required('super_admin')
+def update_employee_salary(user_id):
+    new_salary = request.form.get('salary')
+
+    try:
+        new_salary = float(new_salary)
+    except:
+        flash("Invalid salary value.", "danger")
+        return redirect(url_for('admin_employees'))
+
+    MIN_SALARY = 0
+    MAX_SALARY = 200000
+
+    if new_salary < MIN_SALARY or new_salary > MAX_SALARY:
+        flash(f"Salary must be between {MIN_SALARY} and {MAX_SALARY}.", "danger")
+        return redirect(url_for('admin_employees'))
+
+    execute_db(
+        "UPDATE EMPLOYEE SET salary = %s WHERE User_id = %s",
+        [new_salary, user_id]
+    )
+
+    flash("Salary updated successfully!", "success")
+    return redirect(url_for('admin_employees'))
 
 @app.route('/admin/instructors')
 @login_required

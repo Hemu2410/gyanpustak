@@ -1,113 +1,172 @@
 {% extends 'base.html' %}
 {% block title %}Manage Employees - GyanPustak{% endblock %}
+
 {% block content %}
 <div class="container">
+
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
         <div>
             <h2>Manage Employees</h2>
-            <p>Super Admin: Add and view employees</p>
+            <p>Super Admin Control Panel</p>
         </div>
-        <button onclick="document.getElementById('empModal').classList.add('active')" class="btn btn-primary">Add Employee</button>
+
+        <button onclick="document.getElementById('empModal').classList.add('active')" class="btn btn-primary">
+            Add Employee
+        </button>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>User ID</th>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Gender</th>
-                <th>Salary</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for emp in employees %}
-            <tr>
-                <td>{{ emp['User_id'] }}</td>
-                <td>{{ emp['emp_id'] }}</td>
-                <td>{{ emp['name'] }}</td>
-                <td>{{ emp['Email'] }}</td>
-                <td>
-                    <span class="badge badge-{% if emp['role'] == 'super_admin' %}completed{% elif emp['role'] == 'admin' %}assigned{% else %}new{% endif %}">
-                        {{ (emp['role'] or '').replace('_', ' ').title() }}
-                    </span>
-                </td>
-                <td>{{ emp['gender'] or '-' }}</td>
-                <td>Rs. {{ "%.2f"|format(emp['salary'] or 0) }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Emp ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Gender</th>
+                    <th>Salary</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for emp in employees %}
+                <tr>
+                    <td>{{ emp['User_id'] }}</td>
+                    <td>{{ emp['emp_id'] }}</td>
+                    <td>{{ emp['name'] }}</td>
+                    <td>{{ emp['Email'] }}</td>
+
+                    <td>
+                        <span class="badge badge-{{ emp['role'] }}">
+                            {{ (emp['role'] or '').replace('_',' ').title() }}
+                        </span>
+                    </td>
+
+                    <td>{{ emp['gender'] or '-' }}</td>
+
+                    <td>
+                        Rs. {{ "%.2f"|format(emp['salary'] or 0) }}
+
+                        <!-- update salary -->
+                        <form method="post"
+                              action="{{ url_for('update_employee_salary', user_id=emp['User_id']) }}"
+                              style="margin-top:6px; display:flex; gap:6px;">
+                            <input type="number"
+                                   name="salary"
+                                   step="0.01"
+                                   placeholder="Update"
+                                   style="width:90px; padding:4px;">
+
+                            <button class="btn btn-sm btn-primary">Save</button>
+                        </form>
+                    </td>
+
+                    <td>
+                        <!-- DELETE -->
+                        <form method="post"
+                              action="{{ url_for('admin_delete_employee', user_id=emp['User_id']) }}"
+                              onsubmit="return confirm('Delete this employee?')">
+
+                            <button class="btn btn-sm btn-danger">
+                                Remove
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
+<!-- ADD EMPLOYEE MODAL -->
 <div class="modal-overlay" id="empModal">
     <div class="modal" style="max-width:550px;">
         <h3>Add New Employee</h3>
+
         <form method="post" action="{{ url_for('admin_add_employee') }}">
+
             <div class="form-row">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" name="name" required placeholder="Employee name">
+                    <input name="name" required>
                 </div>
+
                 <div class="form-group">
                     <label>Employee ID</label>
-                    <input type="text" name="emp_id" required placeholder="e.g. EMP004">
+                    <input name="emp_id" required>
                 </div>
             </div>
+
             <div class="form-row">
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" required placeholder="Email address">
+                    <input name="email" type="email" required>
                 </div>
+
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" name="password" required placeholder="Initial password">
+                    <input name="password" type="password" required>
                 </div>
             </div>
+
             <div class="form-row">
                 <div class="form-group">
                     <label>Role</label>
-                    <select name="role" required>
+                    <select name="role">
                         <option value="customer_support">Customer Support</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label>Gender</label>
                     <select name="gender">
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
                     </select>
                 </div>
             </div>
+
             <div class="form-row">
                 <div class="form-group">
                     <label>Salary</label>
-                    <input type="number" name="salary" step="0.01" placeholder="Monthly salary">
+                    <input name="salary" type="number" step="0.01">
                 </div>
+
                 <div class="form-group">
-                    <label>Aadhaar Number</label>
-                    <input type="text" name="aadhaar" placeholder="12-digit Aadhaar" maxlength="12">
+                    <label>Aadhaar</label>
+                    <input name="aadhaar">
                 </div>
             </div>
+
             <div class="form-row">
                 <div class="form-group">
                     <label>Phone</label>
-                    <input type="text" name="phone" placeholder="Phone number">
+                    <input name="phone">
                 </div>
+
                 <div class="form-group">
                     <label>Address</label>
-                    <input type="text" name="address" placeholder="Address">
+                    <input name="address">
                 </div>
             </div>
-            <div style="display:flex;gap:10px;justify-content:flex-end;">
-                <button type="button" onclick="document.getElementById('empModal').classList.remove('active')" class="btn btn-outline">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Employee</button>
+
+            <div style="display:flex;justify-content:flex-end;gap:10px;">
+                <button type="button"
+                        class="btn btn-outline"
+                        onclick="document.getElementById('empModal').classList.remove('active')">
+                    Cancel
+                </button>
+
+                <button class="btn btn-primary">Add</button>
             </div>
+
         </form>
     </div>
 </div>
+
 {% endblock %}
